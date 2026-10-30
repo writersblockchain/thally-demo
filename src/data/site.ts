@@ -173,16 +173,14 @@ const templateSiteConfig: SiteConfig = {
   brandPresets,
 }
 
-// Managed by Thally Cloud onboarding.
 export const siteConfig: SiteConfig = {
   ...templateSiteConfig,
-  name: "Thally Demo",
-  description: "A documentation site using Thally",
-  repoUrl: "https://github.com/writersblockchain/thally-demo",
+  name: 'Thally Demo - Getting Started with AssemblyAI',
+  description: 'Turn audio into text with AssemblyAI. Install the Python SDK, transcribe your first file, and build a YouTube podcast transcription workflow.',
+  repoUrl: '',
   links: [
-    { label: "Get started", href: "/quickstart" },
-    { label: "Support", href: "https://github.com/writersblockchain/thally-demo/issues/new" },
-    { label: "GitHub", href: "https://github.com/writersblockchain/thally-demo" },
-    { label: "Changelog", href: "/changelog" },
+    { label: 'Quickstart', href: '/quickstart' },
+    { label: 'API dashboard', href: 'https://www.assemblyai.com/dashboard' },
+    { label: 'Official docs', href: 'https://www.assemblyai.com/docs' },
   ],
 };

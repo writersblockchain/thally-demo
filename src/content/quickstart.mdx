@@ -1,47 +1,86 @@
 ---
 title: Quickstart
-description: Guide a new reader through one useful workflow and show them how to verify it.
+description: Install the AssemblyAI Python SDK and save your first transcript from a sample audio file.
 ---
 
-A strong quickstart produces one meaningful result. Replace the placeholders
-below with the shortest supported path for your product.
+Transcribe a sample recording and save the result to `transcript.txt`.
 
 ## Before you begin
 
-List only the requirements needed for this workflow:
+You need Python 3.11+ and an [AssemblyAI API key](https://www.assemblyai.com/dashboard) with available credits. Run the following commands in a terminal.
 
-- An account or credential, when required
-- A supported runtime, device, browser, or operating system
-- Permission to create or change the resource used in the example
+## 1. Install the SDK
 
-<Steps>
-  <Step title="Install the required tool">
-    Give readers one recommended installation command.
+Create a project and a virtual environment:
 
-    ```bash
-    npm install your-package
-    ```
-  </Step>
-  <Step title="Add the minimum configuration">
-    Include only the values needed for the first successful run.
+```bash
+mkdir assemblyai-demo
+cd assemblyai-demo
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade assemblyai
+```
 
-    ```bash
-    your-cli init
-    ```
-  </Step>
-  <Step title="Complete the first task">
-    Use a realistic example that produces an observable result.
+On Windows, use `py` instead of `python3` to create the environment, then activate it with `.venv\Scripts\Activate.ps1` in PowerShell.
 
-    ```bash
-    your-cli start
-    ```
-  </Step>
-  <Step title="Verify the result">
-    State exactly what the reader should see and how to recover when it does not appear.
-  </Step>
-</Steps>
+## 2. Set your API key
 
-## Choose the next task
+In the same terminal, replace the placeholder with your key:
 
-Link to the guide that naturally follows this result. Avoid ending the reader’s
-journey with a generic list of every feature.
+```bash
+export ASSEMBLYAI_API_KEY="your-api-key"
+```
+
+In PowerShell, use `$env:ASSEMBLYAI_API_KEY="your-api-key"`. Keep the key out of your source files and Git.
+
+## 3. Transcribe an audio file
+
+Save this code as `transcribe.py`:
+
+```python
+import os
+from pathlib import Path
+
+from assemblyai import TranscriptStatus
+from assemblyai.prerecorded.v2 import Transcriber
+
+api_key = os.environ.get("ASSEMBLYAI_API_KEY")
+if not api_key:
+    raise SystemExit("Set ASSEMBLYAI_API_KEY in this terminal first.")
+
+transcriber = Transcriber(api_key=api_key)
+transcript = transcriber.transcribe("https://assembly.ai/wildfires.mp3")
+
+print(f"Transcript ID: {transcript.id}")
+if transcript.status == TranscriptStatus.error:
+    raise SystemExit(f"Transcription failed: {transcript.error}")
+
+Path("transcript.txt").write_text(transcript.text or "", encoding="utf-8")
+print(transcript.text)
+print("Saved transcript.txt")
+```
+
+Run it:
+
+```bash
+python transcribe.py
+```
+
+The SDK waits for the job to finish. You should see a transcript about Canadian wildfires in your terminal and a new `transcript.txt` file in your project.
+
+To use your own recording, replace the sample URL with a local path such as `"./interview.mp3"`. The SDK uploads local files for you.
+
+## Troubleshooting
+
+| Problem | What to do |
+| --- | --- |
+| Missing API key or authentication error | Set the key in the terminal running the script. Copy it again from your dashboard if needed. |
+| Import error | Activate `.venv` and run `python -m pip install --upgrade assemblyai`. Don’t name your script `assemblyai.py`. |
+| Insufficient balance | Check your credits and billing in the AssemblyAI dashboard. |
+| Transcription fails | Read the printed error. Use a playable audio file or a direct, publicly accessible media URL. |
+
+## Next step
+
+[Transcribe a YouTube podcast](/guides/transcribe-a-youtube-podcast) using a pasted episode URL.
+
+Based on the [AssemblyAI speech-to-text quickstart](https://www.assemblyai.com/docs/pre-recorded-audio/getting-started/transcribe-an-audio-file).

@@ -1,45 +1,35 @@
 ---
 title: Introduction
-description: Give readers a clear path from their first question to a result they can verify.
+description: Build speech-to-text features with AssemblyAI, from your first audio file to a podcast transcript.
 mode: home
 ---
 
 <Hero
-  title="Build documentation around the reader"
-  subtitle="Start with a useful first result, organize what follows, and publish every format from one reviewable source."
-  primaryLabel="Get started"
+  title="Turn audio into text"
+  subtitle="Build with AssemblyAI’s speech-to-text API. Start with one audio file, then transcribe a podcast with speaker labels."
+  primaryLabel="Start the quickstart"
   primaryHref="/quickstart"
-  secondaryLabel="Publish your docs"
-  secondaryHref="/guides/create-a-site"
+  secondaryLabel="Transcribe a podcast"
+  secondaryHref="/guides/transcribe-a-youtube-podcast"
 />
 
-## Build the reader journey
+## What is AssemblyAI?
 
-Begin with the task that brings most readers to your documentation, then make
-the next useful step obvious.
+AssemblyAI gives you APIs and SDKs for turning speech into text. You send audio or video and receive a transcript you can use in your application. Add speaker labels to tell who spoke, or process live audio for real-time experiences.
+
+These docs are for developers adding transcription to tools for podcasts, meetings, interviews, or recorded calls. You only need basic Python knowledge to follow along.
+
+## Get your first result
 
 <CardGroup cols="2">
-  <Card title="Write your quickstart" icon="party-horn" href="/quickstart">
-    Turn prerequisites, setup, one realistic task, and verification into a short path.
+  <Card title="Quickstart" icon="code-simple" href="/quickstart">
+    Install the Python SDK and save your first audio transcript.
   </Card>
-  <Card title="Organize your navigation" icon="grid-round" href="/customization">
-    Group related tasks and references around how people use your product.
-  </Card>
-  <Card title="Document your API" icon="code-simple" href="/api">
-    Replace `openapi.yaml` to publish browsable endpoint docs with a live playground.
-  </Card>
-  <Card title="Learn the Thally workflow" icon="wrench" href="/guides/create-a-site">
-    Create, publish, and update sites from the Cloud dashboard, the CLI, or your AI tools.
+  <Card title="Transcribe a YouTube podcast" icon="microphone" href="/guides/transcribe-a-youtube-podcast">
+    Paste an episode URL and save a transcript with timestamps and speaker labels.
   </Card>
 </CardGroup>
 
-## Publish from one source
+You’ll need an [AssemblyAI account and API key](https://www.assemblyai.com/dashboard). Transcription uses your account’s available credits.
 
-Thally turns the same reviewed content into HTML, search, agent discovery files,
-Markdown mirrors, and a read-only MCP surface — so people and AI tools read the
-same, current answer. Add only the locales your readers need.
-
-<Note type="info" title="Start with the product, not the template">
-  Replace this page with the questions, terminology, and workflows your readers
-  already use. Keep `docs.json` focused on the path between those tasks.
-</Note>
+For the full API surface, see the [official AssemblyAI documentation](https://www.assemblyai.com/docs).

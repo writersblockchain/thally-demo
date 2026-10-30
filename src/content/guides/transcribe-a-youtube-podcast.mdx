@@ -1,0 +1,146 @@
+---
+title: Transcribe a YouTube podcast
+description: Paste a YouTube episode URL and save a podcast transcript with timestamps and speaker labels using Python and AssemblyAI.
+---
+
+Build a terminal script that asks for a YouTube URL, downloads the episode’s audio, and saves a readable transcript with speaker labels and timestamps.
+
+A YouTube watch page is not a direct audio URL. You’ll use `yt-dlp` to download the audio, then let the AssemblyAI SDK upload and transcribe it.
+
+## Before you begin
+
+Complete the [quickstart](/quickstart) first. Keep its virtual environment active and `ASSEMBLYAI_API_KEY` set. Use a public episode you own or have permission to download and transcribe.
+
+## 1. Install the download tools
+
+In your project’s terminal:
+
+```bash
+python -m pip install --upgrade "yt-dlp[default]"
+```
+
+Install [Deno](https://docs.deno.com/runtime/getting_started/installation/) and [FFmpeg](https://ffmpeg.org/download.html) for YouTube extraction and media handling. On macOS with Homebrew:
+
+```bash
+brew install deno ffmpeg
+```
+
+On Windows or Linux, use the installers linked above. Check that both commands are on your `PATH`:
+
+```bash
+deno --version
+ffmpeg -version
+```
+
+## 2. Create the script
+
+Save this as `podcast.py` in the same project:
+
+```python
+import os
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from urllib.parse import urlparse
+
+import yt_dlp
+from assemblyai import TranscriptStatus
+from assemblyai.prerecorded.v2 import Transcriber, TranscriptionConfig
+
+
+def timestamp(milliseconds):
+    seconds = int(milliseconds // 1000)
+    hours, seconds = divmod(seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+    return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+
+
+def main():
+    api_key = os.environ.get("ASSEMBLYAI_API_KEY")
+    if not api_key:
+        raise SystemExit("Set ASSEMBLYAI_API_KEY in this terminal first.")
+
+    url = input("Paste a YouTube episode URL: ").strip()
+    parsed = urlparse(url)
+    if parsed.scheme not in {"http", "https"} or parsed.hostname not in {
+        "youtube.com", "www.youtube.com", "m.youtube.com", "youtu.be"
+    }:
+        raise SystemExit("Enter a youtube.com or youtu.be URL.")
+
+    with TemporaryDirectory() as folder:
+        options = {
+            "format": "bestaudio/best",
+            "noplaylist": True,
+            "outtmpl": str(Path(folder) / "episode.%(ext)s"),
+        }
+        print("Downloading episode audio...")
+        with yt_dlp.YoutubeDL(options) as downloader:
+            info = downloader.extract_info(url, download=True)
+            audio_path = downloader.prepare_filename(info)
+
+        print("Uploading and transcribing. This may take several minutes...")
+        transcriber = Transcriber(api_key=api_key)
+        transcript = transcriber.transcribe(
+            audio_path,
+            config=TranscriptionConfig(
+                speaker_labels=True,
+                language_detection=True,
+            ),
+        )
+
+        print(f"Transcript ID: {transcript.id}")
+        if transcript.status == TranscriptStatus.error:
+            raise SystemExit(f"Transcription failed: {transcript.error}")
+
+        lines = [
+            f"[{timestamp(segment.start)}] Speaker {segment.speaker}: {segment.text}"
+            for segment in (transcript.utterances or [])
+        ]
+        text = "\n\n".join(lines) if lines else (transcript.text or "")
+        output = Path(f"podcast-{transcript.id}.txt")
+        output.write_text(text, encoding="utf-8")
+        print(f"Saved {output.resolve()}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+The script downloads a single episode into a temporary folder. The SDK uploads that file and waits for transcription. When the script exits, the temporary download is removed and your transcript stays in the project.
+
+## 3. Paste an episode URL
+
+```bash
+python podcast.py
+```
+
+When prompted, paste the episode’s YouTube URL and press Enter:
+
+```text
+Paste a YouTube episode URL: https://www.youtube.com/watch?v=YOUR_VIDEO_ID
+```
+
+Replace `YOUR_VIDEO_ID` with your episode’s ID, or paste its full URL directly. Wait for the `Saved` message, then open the resulting `podcast-<transcript-id>.txt` file.
+
+Your output will look like this (illustrative):
+
+```text
+[00:00:03] Speaker A: Welcome to the podcast.
+
+[00:00:07] Speaker B: Thanks for having me.
+```
+
+Speaker letters distinguish voices; they do not identify people by name. Timestamps mark the start of each speech segment. Review the transcript before publishing it, especially names and overlapping speech.
+
+## Troubleshooting
+
+| Problem | What to do |
+| --- | --- |
+| YouTube extraction or JavaScript challenge error | Update with `python -m pip install --upgrade "yt-dlp[default]"`. Check that `deno --version` works. |
+| Video unavailable, sign-in required, or HTTP 403 | Try a public, unrestricted episode you can download. If YouTube blocks the download, use the original audio from the podcast owner instead. |
+| FFmpeg not found | Install the FFmpeg executable, reopen your terminal, and verify `ffmpeg -version`. |
+| Authentication or balance error | Check `ASSEMBLYAI_API_KEY` and available credits in your dashboard. |
+| No text or unexpected speakers | Confirm the episode has audible speech. Music, crosstalk, and short turns can affect results. |
+
+If you already have the original audio, use its local path in the [quickstart](/quickstart) to skip the YouTube download. Keep your transcript ID when asking AssemblyAI support for help. Running transcription again creates a new job and can use more credits.
+
+For more detail, see AssemblyAI’s [YouTube transcription tutorial](https://www.assemblyai.com/docs/pre-recorded-audio/guides/transcribe_youtube_videos), [speaker labels reference](https://www.assemblyai.com/docs/pre-recorded-audio/label-speakers), and the [yt-dlp installation guide](https://github.com/yt-dlp/yt-dlp#installation).
