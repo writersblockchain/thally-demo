@@ -42,6 +42,12 @@
           "pages": [
             "guides/transcribe-a-youtube-podcast"
           ]
+        },
+        {
+          "group": "Build with Thally",
+          "pages": [
+            "guides/build-a-thally-site"
+          ]
         }
       ]
     }

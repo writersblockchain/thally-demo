@@ -1,0 +1,107 @@
+---
+title: Build a documentation site with Thally
+description: Create a focused Thally site, preview it locally, and publish updates through a connected GitHub repository and Thally Cloud.
+---
+
+Create a small documentation site with a home page, a quickstart, and a practical guide. You’ll write MDX, configure navigation, preview locally, and publish to a `thally.app` address.
+
+## Before you begin
+
+You need a [Thally Cloud account](https://app.thally.io/), a GitHub account with permission to approve the Thally GitHub App, and Git installed locally. For local development, use Node.js 22.14+ or 24+ with npm.
+
+## 1. Create your site and clone its repository
+
+In Thally Cloud, select **Create a site**, enter your site name and preferred address, and choose **Create a new docs repository**. Approve the GitHub App for the intended account. Fresh repository creation requires **All repositories** access; if your organization requires selected-repository access, connect an existing compatible Thally repository instead.
+
+Skip optional product sources if you only need documentation. Review the repository and production branch, then select **Publish site**. Wait until Cloud shows **Live**.
+
+Clone the repository shown in your site summary, replacing the example URL with yours:
+
+```bash
+git clone https://github.com/YOUR_ACCOUNT/YOUR_DOCS_REPO.git
+cd YOUR_DOCS_REPO
+npm ci
+npm run dev
+```
+
+Open `http://localhost:3040`. Read the repository’s `AGENTS.md` before editing.
+
+## 2. Configure the site
+
+Keep your changes in the files you own:
+
+| File | What to change |
+| --- | --- |
+| `src/data/site.ts` | Site name, description, links, and brand defaults |
+| `docs.json` | Tabs, sidebar groups, and page order |
+| `src/content/` | Documentation pages |
+
+Set your product identity in `siteConfig` in `src/data/site.ts`. Check Cloud’s site details too: managed identity settings can override repository defaults. Leave generated runtime files and `starter-release.json` unchanged.
+
+## 3. Write three useful pages
+
+Replace `src/content/introduction.mdx` with a short explanation of your product and audience. Use `quickstart.mdx` for one runnable workflow. Create `src/content/guides/first-task.mdx` for a practical task:
+
+```mdx
+---
+title: Complete your first task
+description: Set up your project and verify your first successful result.
+---
+
+Explain what you will accomplish, list prerequisites, and provide the steps.
+
+## Verify the result
+
+Show what success looks like and how to fix a common error.
+```
+
+In `docs.json`, replace the starter’s `tabs` array with:
+
+```json
+"tabs": [
+  {
+    "tab": "Get started",
+    "groups": [
+      { "group": "Get started", "pages": ["introduction", "quickstart"] }
+    ]
+  },
+  {
+    "tab": "Guide",
+    "groups": [
+      { "group": "Practical guide", "pages": ["guides/first-task"] }
+    ]
+  }
+]
+```
+
+Page IDs match paths under `src/content/` without `.mdx`. Remove unused starter pages and links, then check each page and code example locally.
+
+## 4. Validate and publish
+
+Run the checks before pushing:
+
+```bash
+npm run check -- --ci
+npm run typecheck
+npm run build
+```
+
+Commit the intended content and configuration changes, then push to the production branch connected in Cloud. For a site using `main`:
+
+```bash
+git add src/content docs.json src/data/site.ts
+git commit -m "docs: add getting started content"
+git push origin main
+```
+
+### Changes aren’t live yet
+
+During this demo, the push succeeded but the live site still showed the starter. A successful Git push alone does not confirm publication.
+
+Connect your Thally documentation repository to your Thally Cloud account, grant the GitHub App access, and confirm the configured production branch. Cloud needs that connection for repository updates to appear in managed deployments. Check **Deployments** for the commit you pushed and its status.
+
+You can also manage publishing from Thally Cloud instead of the CLI. Confirm the selected revision before publishing; **Redeploy site** republishes the current version, so it does not by itself select newer Git changes. The CLI’s `thally deploy` targets self-hosted providers and does not update your managed `thally.app` site.
+
+Wait for the intended deployment to become **Live**, then open its URL and verify your new content. If it remains stale, compare the live deployment’s commit with your latest push before retrying.
+
+For the complete workflow, see the official [Thally quickstart](https://docs.thally.io/quickstart) and [managed hosting guide](https://docs.thally.io/guides/managed-hosting).
