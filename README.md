@@ -1,121 +1,63 @@
-# Thally Starter
+# Getting started with AssemblyAI and Thally
 
-A production-ready documentation site built with the open-source Thally runtime.
-Use this repository as a GitHub template or clone it directly, then replace the
-starter content with documentation for your product.
+A developer guide to using AssemblyAI and building documentation with Thally. The site gives you a short path from installing the AssemblyAI Python SDK to saving a transcript, then shows you how to build and publish a documentation site of your own.
 
-Thally is the product knowledge layer for software teams. This starter is its
-portable publishing foundation: your content stays in Git, and the same source
-can serve people, search engines, and AI tools.
+**View the site:** [thally-demo.thally.app](https://thally-demo.thally.app/)
 
-This is the canonical complete template consumed by Thally Cloud, the CLI, and
-the MCP server. Runtime code is authored once in
-[`thallylabs/thally`](https://github.com/thallylabs/thally), then generated into
-this repository as a pinned, byte-identical snapshot. Do not manually repeat a
-runtime fix in both repositories.
+## What you’ll learn
 
-This README covers the portable starter, not the full managed platform. The
-sole production architecture authority is
-[`thally-cloud/ARCHITECTURE.md`](https://github.com/thallylabs/thally-cloud/blob/main/ARCHITECTURE.md),
-available to maintainers with access to the private repository. The CLI, MCP,
-and Cloud creation flows consume an exact promoted scaffold release rather
-than treating the mutable `main` branch as a release identity.
+- **Introduction:** What AssemblyAI does, who it’s for, and a short video tour of the site.
+- **Quickstart:** Install the Python SDK, configure your API key, and transcribe a sample audio file. The example has been tested against the live AssemblyAI API.
+- **YouTube podcast guide:** Paste an episode URL, download its audio, and save a transcript with timestamps and speaker labels.
+- **Thally guide:** Create a documentation site, configure its navigation and identity, write MDX pages, and publish through GitHub and Thally Cloud.
 
 ## Run locally
 
+You need Git, Node.js 22.14+ or 24+, and npm.
+
 ```bash
-npm install
+git clone https://github.com/writersblockchain/thally-demo.git
+cd thally-demo
+npm ci
 npm run dev
 ```
 
-Node.js 22.14+ or 24+ is recommended; Node.js 20.19+ is also supported.
-The checked-in npm lockfile makes `npm ci` the
-reproducible installation command. You can also use `pnpm install` or
-`yarn install`; use one package manager per project and commit its lockfile.
+Open [localhost:3040](http://localhost:3040). If the port is occupied, use `npm run dev -- --port 3041`.
 
-If installation is interrupted, keep your content and configuration. Remove
-only `node_modules`, then run `npm ci` again (or your selected package manager's
-install command). This repairs incomplete packages such as Shiki without
-recreating the site or deleting the dependency lockfile.
+You don’t need an AssemblyAI API key to run the documentation site. To execute the transcription examples, follow the quickstart and supply your own key with available credits. Keep credentials out of source files and Git.
 
-Open [http://localhost:3040](http://localhost:3040). If that port is occupied,
-choose another with `npm run dev -- --port 3041`.
+## Edit the documentation
 
-The default project runs Next.js directly and does not install the Thally CLI.
-Use `npm run check` to validate documentation and `npm run starter:update` to
-preview framework updates. These commands explicitly invoke the current official
-`@thallylabs/cli` package, so a frozen local CLI cannot block a newer scaffold.
-Pass update options after `--`, for example `npm run starter:update -- --apply`
-after reviewing the dry run. For other commands, run
-`npx --yes --package=@thallylabs/cli@latest thally --help`.
+| Path | Purpose |
+| --- | --- |
+| `src/content/introduction.mdx` | Homepage and video introduction |
+| `src/content/quickstart.mdx` | AssemblyAI SDK quickstart |
+| `src/content/guides/` | Podcast transcription and Thally site-building guides |
+| `docs.json` | Navigation and footer configuration |
+| `src/data/site.ts` | Site identity and brand defaults |
+| `public/` | Video and other static assets |
 
-## Make it yours
+Every MDX page needs `title` and `description` frontmatter. Add new pages to `docs.json` so readers can find them. Read [AGENTS.md](AGENTS.md) for ownership and contribution rules; runtime-owned files and `starter-release.json` are managed by Thally’s update workflow.
 
-- Edit pages in `src/content/`.
-- Organize navigation and features in `docs.json`.
-- Set the product name, links, and versioned brand defaults in `src/data/site.ts`.
-- Replace `openapi.yaml` with your API specification.
-- Add logos or favicons in `public/` and reference them from your site settings.
+## Validate and publish
 
-`starter-release.json` records the immutable starter and runtime version used
-to create the site. Keep it in the repository so `npm run starter:update` can
-plan framework updates without overwriting your content or portable settings.
-
-`npm run starter:update` performs a three-way comparison between the recorded
-previous scaffold, the promoted target scaffold, and your current project. It
-updates unchanged framework-owned files, preserves user-owned files, and stops
-for manual review when those contracts overlap. The command is a dry run until
-you pass `--apply`.
-
-Maintainers update the generated runtime snapshot through the **Sync Thally
-runtime** workflow. CI rejects a changed pin without matching files, changed
-files without a matching pin, missing files, and stale runtime files.
-
-Content icons are neutral by default. Set `appearance.contentIcons` to `accent`
-in `docs.json`, or add `iconColor="accent"` to an individual card or tile.
-Public page URLs ending in `.md` are disabled by default; enable them explicitly
-with `markdown.enabled` when that distribution surface fits your access model.
-
-## Validate changes
+Before pushing changes, run:
 
 ```bash
-npm run check
+npm run check -- --ci
 npm run typecheck
 npm run build
 ```
 
-CI runs the same content check with the pinned workflow tooling:
-`npm ci --ignore-scripts --prefix .github/thally-tooling`, then
-`.github/thally-tooling/node_modules/.bin/thally check --ci .`.
+This site is hosted by Thally Cloud. Push reviewed changes to the connected repository’s production branch (`main`) to trigger deployment. The Thally GitHub App must have access to the repository, and the repository and branch must match the site’s Cloud configuration.
 
-## Deploy
+Check **Deployments** in Thally Cloud for the expected commit and wait for it to become **Live**. Then verify the published page. You can also manage publishing in Cloud; the CLI’s `thally deploy` command targets self-hosted providers rather than this managed `thally.app` site.
 
-The site is a standard Next.js application. Deploy it through Thally Cloud or
-any compatible Next.js host. Cloudflare Workers configuration is included in
-`open-next.config.ts` and `wrangler.jsonc`. Provider deployment packages and
-Thally’s internal test suites are excluded from the default installation.
-Thally Cloud supplies its own pinned deployment tooling. For self-hosted
-Cloudflare builds, install the optional provider profile explicitly:
+## References
 
-```bash
-npm run setup:cloudflare
-npm run build:cloudflare
-```
-
-The setup command records exact OpenNext and Wrangler versions in your project.
-Other Next.js hosts need only the default installation.
-
-Thally Cloud publishes an immutable managed site release and activates it by
-moving the site's production pointer only after validation. Direct hosts use
-their own release and rollback mechanisms; publishing a package or synchronizing
-this starter does not move an existing site's pointer.
-
-On Vercel, the site URL used for canonical and agent links is detected
-automatically. On other hosts, for a custom domain, or on Cloudflare Workers,
-set `THALLY_SITE_URL` in your host's environment.
-
-Copy `.env.example` to `.env.local` only when you need optional services. Never
-commit real credentials.
+- [AssemblyAI documentation](https://www.assemblyai.com/docs)
+- [Thally quickstart](https://docs.thally.io/quickstart)
+- [Thally managed hosting](https://docs.thally.io/guides/managed-hosting)
 
 ## License
 
