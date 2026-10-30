@@ -166,7 +166,6 @@ const templateSiteConfig: SiteConfig = {
   repoUrl: '',
   links: [
     { label: 'Get started', href: '/quickstart' },
-    { label: 'Changelog', href: '/changelog' },
   ],
   brand: brandPresets[brandPreset],
   brandPreset,
@@ -180,7 +179,6 @@ export const siteConfig: SiteConfig = {
   repoUrl: '',
   links: [
     { label: 'Quickstart', href: '/quickstart' },
-    { label: 'API dashboard', href: 'https://www.assemblyai.com/dashboard' },
     { label: 'Official docs', href: 'https://www.assemblyai.com/docs' },
   ],
 };

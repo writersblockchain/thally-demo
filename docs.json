@@ -53,6 +53,21 @@
     }
   ],
   "footer": {
-    "copyright": " "
+    "copyright": " ",
+    "links": [
+      {
+        "heading": "Resources",
+        "items": [
+          {
+            "label": "Get started",
+            "href": "/quickstart"
+          },
+          {
+            "label": "GitHub",
+            "href": "https://github.com/writersblockchain/thally-demo"
+          }
+        ]
+      }
+    ]
   }
 }
